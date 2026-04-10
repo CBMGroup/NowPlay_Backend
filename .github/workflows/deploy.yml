@@ -10,19 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Get code
+      # 1. Get code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Build & push image
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: yourdockerhubusername/nowplay:latest
-
-      # Deploy to VPS
+      # 2. Deploy to VPS via SSH
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -33,9 +25,12 @@ jobs:
           script: |
             cd ~/NowPlay_Backend
 
-            docker pull yourdockerhubusername/nowplay:latest
+            # Pull latest code from your repo
+            git pull origin main
 
+            # Rebuild containers locally (NO docker hub)
             docker-compose down
-            docker-compose up -d
+            docker-compose up -d --build
 
+            # Clean unused images/containers
             docker system prune -f
