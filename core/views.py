@@ -135,7 +135,7 @@ class DashboardStatsView(APIView):
             'active_artists': Artist.objects.count(),
             'total_streams': Stream.objects.count(),
             'recent_activity': self.get_recent_activity(),
-            'top_tracks': TrackSerializer(Track.objects.order_by('-plays')[:5], many=True).data
+            'top_tracks': TrackSerializer(Track.objects.order_by('-plays')[:5], many=True, context={'request': request}).data
         })
 
     def get_recent_activity(self):
