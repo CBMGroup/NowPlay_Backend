@@ -4,13 +4,25 @@ from .models import User, Artist, Album, Track, Playlist, Like, Stream
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'role', 'avatar_url', 'status', 'preferences', 'joined_date')
-        read_only_fields = ('joined_date',)
+        fields = (
+            'id', 'username', 'email', 'role', 'avatar_url', 'status', 
+            'preferences', 'joined_date', 'is_staff', 'is_active', 'date_joined'
+        )
+        read_only_fields = ('joined_date', 'date_joined')
 
 class ArtistSerializer(serializers.ModelSerializer):
+    tracks_count = serializers.SerializerMethodField()
+    albums_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Artist
         fields = '__all__'
+
+    def get_tracks_count(self, obj):
+        return obj.tracks.count()
+
+    def get_albums_count(self, obj):
+        return obj.albums.count()
 
 class AlbumSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.name')

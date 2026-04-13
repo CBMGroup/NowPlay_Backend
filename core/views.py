@@ -126,7 +126,7 @@ class RecommendationView(APIView):
         serializer = TrackSerializer(recommendations, many=True, context={'request': request})
         return Response(serializer.data)
 class DashboardStatsView(APIView):
-    permission_classes = [permissions.IsAuthenticated] # Simplified for now, adjust to IsAdminUser later
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
         return Response({
