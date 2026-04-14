@@ -24,7 +24,7 @@ services:
       - db
     volumes:
       - static_volume:/app/staticfiles
-      # - media_volume:/app/media
+      - media_volume:/app/media
 
   caddy:
     image: caddy:2-alpine
@@ -36,6 +36,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -44,6 +46,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  # media_volume:
+  media_volume:
   caddy_data:
   caddy_config:
