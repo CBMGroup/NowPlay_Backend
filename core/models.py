@@ -48,6 +48,8 @@ class Track(models.Model):
         ('Radio', 'Radio'),
         ('Ugandan Music', 'Ugandan Music'),
         ('Audiobooks', 'Audiobooks'),
+        ('Poems', 'Poems'),
+        ('Audio Plays', 'Audio Plays'),
     )
     title = models.CharField(max_length=255)
     artist_name = models.CharField(max_length=255) # For backward compatibility with basic UI
@@ -58,6 +60,9 @@ class Track(models.Model):
     audio_file = models.FileField(upload_to='tracks/')
     duration = models.IntegerField()  # in seconds
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    description = models.TextField(blank=True, null=True)
+    language = models.CharField(max_length=50, blank=True, null=True)
+    is_explicit = models.BooleanField(default=False)
     plays = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
