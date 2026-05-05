@@ -18,6 +18,8 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate --noinput &&
              gunicorn nowplay_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    environment:
+      - USE_POSTGRES=True
     env_file:
       - .env
     depends_on:
