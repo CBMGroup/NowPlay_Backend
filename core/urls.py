@@ -4,13 +4,22 @@ from core.views import (
     UserRegisterView, ArtistList, ArtistDetail, 
     AlbumViewSet, TrackList, TrackDetail, 
     PlaylistViewSet, LikeToggle, StreamCreate, 
-    RecommendationView, DashboardStatsView, AnalyticsView, UserViewSet
+    RecommendationView, DashboardStatsView, AnalyticsView, UserViewSet,
+    PodcastEpisodeViewSet, AudioBookChapterViewSet, AudioPlayActViewSet, PoemViewSet,
+    PodcastViewSet, AudioBookViewSet, AudioPlayViewSet
 )
 
 router = DefaultRouter()
 router.register(r'playlists', PlaylistViewSet, basename='playlist')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'albums', AlbumViewSet, basename='album')
+router.register(r'podcasts', PodcastEpisodeViewSet, basename='podcastepisode')
+router.register(r'podcast-series', PodcastViewSet, basename='podcast')
+router.register(r'audiobooks', AudioBookChapterViewSet, basename='audiobookchapter')
+router.register(r'audiobook-series', AudioBookViewSet, basename='audiobook')
+router.register(r'audioplays', AudioPlayActViewSet, basename='audioplayact')
+router.register(r'audioplay-series', AudioPlayViewSet, basename='audioplay')
+router.register(r'poems', PoemViewSet, basename='poem')
 
 urlpatterns = [
     path('', include(router.urls)),
