@@ -4,10 +4,18 @@ from rest_framework.views import APIView
 from django.db.models import Count, Q
 from django.utils.timezone import now, timedelta
 from django.db.models.functions import TruncDate
-from .models import User, Artist, Album, Track, Playlist, Like, Stream
+from .models import (
+    User, Artist, Album, Track, Playlist, Like, Stream,
+    Podcast, PodcastEpisode, AudioBook, AudioBookChapter,
+    AudioPlay, AudioPlayAct, Poem
+)
 from .serializers import (
     UserSerializer, ArtistSerializer, AlbumSerializer, 
-    TrackSerializer, PlaylistSerializer, StreamSerializer
+    TrackSerializer, PlaylistSerializer, StreamSerializer,
+    PodcastSerializer, PodcastEpisodeSerializer,
+    AudioBookSerializer, AudioBookChapterSerializer,
+    AudioPlaySerializer, AudioPlayActSerializer,
+    PoemSerializer
 )
 
 class UserRegisterView(generics.CreateAPIView):
@@ -23,6 +31,13 @@ class UserRegisterView(generics.CreateAPIView):
 class ArtistList(generics.ListCreateAPIView):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
+
+    def get_queryset(self):
+        queryset = Artist.objects.all()
+        creator_type = self.request.query_params.get('creator_type')
+        if creator_type:
+            queryset = queryset.filter(creator_type=creator_type)
+        return queryset
 
 class ArtistDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Artist.objects.all()
@@ -56,6 +71,36 @@ class TrackList(generics.ListCreateAPIView):
 class TrackDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
+
+# Specialized ViewSets
+
+class PodcastViewSet(viewsets.ModelViewSet):
+    queryset = Podcast.objects.all()
+    serializer_class = PodcastSerializer
+
+class PodcastEpisodeViewSet(viewsets.ModelViewSet):
+    queryset = PodcastEpisode.objects.all()
+    serializer_class = PodcastEpisodeSerializer
+
+class AudioBookViewSet(viewsets.ModelViewSet):
+    queryset = AudioBook.objects.all()
+    serializer_class = AudioBookSerializer
+
+class AudioBookChapterViewSet(viewsets.ModelViewSet):
+    queryset = AudioBookChapter.objects.all()
+    serializer_class = AudioBookChapterSerializer
+
+class AudioPlayViewSet(viewsets.ModelViewSet):
+    queryset = AudioPlay.objects.all()
+    serializer_class = AudioPlaySerializer
+
+class AudioPlayActViewSet(viewsets.ModelViewSet):
+    queryset = AudioPlayAct.objects.all()
+    serializer_class = AudioPlayActSerializer
+
+class PoemViewSet(viewsets.ModelViewSet):
+    queryset = Poem.objects.all()
+    serializer_class = PoemSerializer
 
 class PlaylistViewSet(viewsets.ModelViewSet):
     serializer_class = PlaylistSerializer
