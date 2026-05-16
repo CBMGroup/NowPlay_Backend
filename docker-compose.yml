@@ -5,6 +5,10 @@ services:
     image: postgres:16-alpine
     container_name: django_db
     restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-nowplay_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     env_file:
       - .env
     volumes:
@@ -15,11 +19,19 @@ services:
     container_name: django_web
     restart: unless-stopped
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
+      sh -c "until pg_isready -h db -U ${POSTGRES_USER:-postgres}; do
+               echo 'Waiting for database...';
+               sleep 2;
+             done;
+             python manage.py collectstatic --noinput &&
              python manage.py migrate --noinput &&
-             gunicorn nowplay_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+             gunicorn nowplay_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"
     environment:
       - USE_POSTGRES=True
+      - POSTGRES_DB=${POSTGRES_DB:-nowplay_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_HOST=db
     env_file:
       - .env
     depends_on:
