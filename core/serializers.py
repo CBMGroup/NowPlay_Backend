@@ -35,6 +35,34 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = Album
         fields = '__all__'
 
+
+# Specialized Serializers
+
+class PodcastSerializer(serializers.ModelSerializer):
+    host_name = serializers.ReadOnlyField(source='host.name')
+    class Meta:
+        model = Podcast
+        fields = '__all__'
+
+class AudioBookSerializer(serializers.ModelSerializer):
+    author_name = serializers.ReadOnlyField(source='author.name')
+    class Meta:
+        model = AudioBook
+        fields = '__all__'
+
+class AudioPlaySerializer(serializers.ModelSerializer):
+    director_name = serializers.ReadOnlyField(source='director.name')
+    class Meta:
+        model = AudioPlay
+        fields = '__all__'
+
+TRACK_FIELDS = (
+    'id', 'title', 'artist_name', 'artist', 'album', 'cover_url', 'cover', 
+    'audio_file', 'duration', 'category', 'description', 'language', 
+    'is_explicit', 'plays', 'created_at', 'artist_details', 'album_details', 
+    'likes_count', 'is_liked', 'specialized_details'
+)
+
 class TrackSerializer(serializers.ModelSerializer):
     artist_details = ArtistSerializer(source='artist', read_only=True)
     album_details = AlbumSerializer(source='album', read_only=True)
@@ -46,7 +74,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = '__all__'
+        fields = TRACK_FIELDS
 
     def get_likes_count(self, obj):
         return obj.likes_received.count()
@@ -91,49 +119,29 @@ class TrackSerializer(serializers.ModelSerializer):
             }
         return None
 
-# Specialized Serializers
-
-class PodcastSerializer(serializers.ModelSerializer):
-    host_name = serializers.ReadOnlyField(source='host.name')
-    class Meta:
-        model = Podcast
-        fields = '__all__'
-
 class PodcastEpisodeSerializer(TrackSerializer):
     podcast_series_details = PodcastSerializer(source='podcast_series', read_only=True)
     class Meta(TrackSerializer.Meta):
         model = PodcastEpisode
-        fields = TrackSerializer.Meta.fields + ('podcast_series', 'podcast_series_details', 'episode_number')
-
-class AudioBookSerializer(serializers.ModelSerializer):
-    author_name = serializers.ReadOnlyField(source='author.name')
-    class Meta:
-        model = AudioBook
-        fields = '__all__'
+        fields = TRACK_FIELDS + ('podcast_series', 'podcast_series_details', 'episode_number')
 
 class AudioBookChapterSerializer(TrackSerializer):
     book_details = AudioBookSerializer(source='book', read_only=True)
     class Meta(TrackSerializer.Meta):
         model = AudioBookChapter
-        fields = TrackSerializer.Meta.fields + ('book', 'book_details', 'chapter_number')
-
-class AudioPlaySerializer(serializers.ModelSerializer):
-    director_name = serializers.ReadOnlyField(source='director.name')
-    class Meta:
-        model = AudioPlay
-        fields = '__all__'
+        fields = TRACK_FIELDS + ('book', 'book_details', 'chapter_number')
 
 class AudioPlayActSerializer(TrackSerializer):
     play_details = AudioPlaySerializer(source='play', read_only=True)
     class Meta(TrackSerializer.Meta):
         model = AudioPlayAct
-        fields = TrackSerializer.Meta.fields + ('play', 'play_details', 'act_number')
+        fields = TRACK_FIELDS + ('play', 'play_details', 'act_number')
 
 class PoemSerializer(TrackSerializer):
     poet_name = serializers.ReadOnlyField(source='poet.name')
     class Meta(TrackSerializer.Meta):
         model = Poem
-        fields = TrackSerializer.Meta.fields + ('poet', 'poet_name')
+        fields = TRACK_FIELDS + ('poet', 'poet_name')
 
 class PlaylistSerializer(serializers.ModelSerializer):
     tracks_details = TrackSerializer(source='tracks', many=True, read_only=True)
