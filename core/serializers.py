@@ -40,21 +40,33 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 class PodcastSerializer(serializers.ModelSerializer):
     host_name = serializers.ReadOnlyField(source='host.name')
+    track_count = serializers.SerializerMethodField()
     class Meta:
         model = Podcast
         fields = '__all__'
+    
+    def get_track_count(self, obj):
+        return obj.episodes.count()
 
 class AudioBookSerializer(serializers.ModelSerializer):
     author_name = serializers.ReadOnlyField(source='author.name')
+    track_count = serializers.SerializerMethodField()
     class Meta:
         model = AudioBook
         fields = '__all__'
+    
+    def get_track_count(self, obj):
+        return obj.chapters.count()
 
 class AudioPlaySerializer(serializers.ModelSerializer):
     director_name = serializers.ReadOnlyField(source='director.name')
+    track_count = serializers.SerializerMethodField()
     class Meta:
         model = AudioPlay
         fields = '__all__'
+    
+    def get_track_count(self, obj):
+        return obj.acts.count()
 
 TRACK_FIELDS = (
     'id', 'title', 'artist_name', 'artist', 'album', 'cover_url', 'cover', 
