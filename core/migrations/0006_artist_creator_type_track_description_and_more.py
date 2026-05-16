@@ -11,31 +11,54 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='artist',
-            name='creator_type',
-            field=models.CharField(choices=[('artist', 'Musical Artist'), ('host', 'Podcast Host'), ('author', 'Author'), ('poet', 'Poet'), ('director', 'Director')], default='artist', max_length=20),
+        migrations.RunSQL(
+            "ALTER TABLE core_artist ADD COLUMN IF NOT EXISTS creator_type varchar(20) DEFAULT 'artist' NOT NULL;",
+            reverse_sql="ALTER TABLE core_artist DROP COLUMN IF EXISTS creator_type;"
         ),
-        migrations.AddField(
-            model_name='track',
-            name='description',
-            field=models.TextField(blank=True, null=True),
+        migrations.RunSQL(
+            "ALTER TABLE core_track ADD COLUMN IF NOT EXISTS description text;",
+            reverse_sql="ALTER TABLE core_track DROP COLUMN IF EXISTS description;"
         ),
-        migrations.AddField(
-            model_name='track',
-            name='is_explicit',
-            field=models.BooleanField(default=False),
+        migrations.RunSQL(
+            "ALTER TABLE core_track ADD COLUMN IF NOT EXISTS is_explicit boolean DEFAULT FALSE NOT NULL;",
+            reverse_sql="ALTER TABLE core_track DROP COLUMN IF EXISTS is_explicit;"
         ),
-        migrations.AddField(
-            model_name='track',
-            name='language',
-            field=models.CharField(blank=True, max_length=50, null=True),
+        migrations.RunSQL(
+            "ALTER TABLE core_track ADD COLUMN IF NOT EXISTS language varchar(50);",
+            reverse_sql="ALTER TABLE core_track DROP COLUMN IF EXISTS language;"
         ),
-        migrations.AlterField(
-            model_name='track',
-            name='artist_name',
-            field=models.CharField(blank=True, max_length=255),
+        # State-only operations to keep Django's internal state in sync
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='artist',
+                    name='creator_type',
+                    field=models.CharField(choices=[('artist', 'Musical Artist'), ('host', 'Podcast Host'), ('author', 'Author'), ('poet', 'Poet'), ('director', 'Director')], default='artist', max_length=20),
+                ),
+                migrations.AddField(
+                    model_name='track',
+                    name='description',
+                    field=models.TextField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='track',
+                    name='is_explicit',
+                    field=models.BooleanField(default=False),
+                ),
+                migrations.AddField(
+                    model_name='track',
+                    name='language',
+                    field=models.CharField(blank=True, max_length=50, null=True),
+                ),
+                migrations.AlterField(
+                    model_name='track',
+                    name='artist_name',
+                    field=models.CharField(blank=True, max_length=255),
+                ),
+            ]
         ),
+        # New tables that likely don't exist yet
         migrations.CreateModel(
             name='AudioBook',
             fields=[
